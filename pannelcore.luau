@@ -795,6 +795,19 @@ function SpellMethods:AddSpell(elementName: string, abilityName: string, eventCa
     }
 end
 
+function SpellMethods:CloneSpell(elementName: string, abilityName: string, originElementName: string, originAbilityName: string)
+
+    if (not Config.SpellsLibrary[originElementName]) then return end
+    if (not Config.SpellsLibrary[originElementName][originAbilityName]) then return end
+
+    if (not Config.SpellsLibrary[elementName]) then Config.SpellsLibrary[elementName] = {} end
+
+    Config.SpellsLibrary[elementName][abilityName] = {
+        ['Event'] = Config.SpellsLibrary[originElementName][originAbilityName]['Event'],
+        ['Function'] = Config.SpellsLibrary[originElementName][originAbilityName]['Function']
+    }
+end
+
 function SpellMethods:UseSpell(elementName: string, abilityName: string)
     if (not Config.SpellsLibrary[elementName]) then return end
 
@@ -1122,4 +1135,6 @@ return {
     ['PlayerFabric'] = PlayerFabric,
     ['EnemyFabric']  = EnemyFabric,
     ['AllyFabric']   = AllyFabric,
+
+    ['Config'] = Config,
 }

@@ -2,7 +2,7 @@
 --local Config = require('./pannelconfig')
 
 local Core       = loadstring(game:HttpGet("https://raw.githubusercontent.com/Wh1teMage/PannelProject/refs/heads/main/pannelcore.luau"))()
-local Config     = loadstring(game:HttpGet("https://raw.githubusercontent.com/Wh1teMage/PannelProject/refs/heads/main/pannelconfig.luau"))()
+local Config     = Core.Config --loadstring(game:HttpGet("https://raw.githubusercontent.com/Wh1teMage/PannelProject/refs/heads/main/pannelconfig.luau"))()
 
 local Players    = game:GetService("Players")
 local Replicated = game:GetService("ReplicatedStorage")
@@ -75,14 +75,22 @@ Core.Spells:AddSpell('Grass', 'Poison Needles',
     end
 )
 
-Core.Spells:AddSpell('Nature', 'Great Tree of Abolition', 
+Core.Spells:CloneSpell('Fire', 'Consecutive Fire Bullets', 'Grass', 'Poison Needles')
+Core.Spells:CloneSpell('Water', 'Water Stream', 'Grass', 'Poison Needles')
+Core.Spells:CloneSpell('Lava', 'Scorching Basalt', 'Grass', 'Poison Needles')
+Core.Spells:CloneSpell('Ice', 'Flurry Heave', 'Grass', 'Poison Needles')
+Core.Spells:CloneSpell('Crystal', 'Lucid Rift', 'Grass', 'Poison Needles')
+Core.Spells:CloneSpell('Darkness', 'Somber Brisk', 'Grass', 'Poison Needles')
+Core.Spells:CloneSpell('spectrum', 'Rainbowifier Maximizer', 'Grass', 'Poison Needles')
+
+Core.Spells:AddSpell('Crystal', 'Crystalline Annihilation', 
     function(elementName, abilityName, self)
 
         DoClientMagic:FireServer(elementName, abilityName)
 
         task.wait(.5)
 
-        task.delay(_G.Offsets['Great Tree of Abolition'], function()
+        task.delay(_G.Offsets[abilityName], function()
             self.SkipCD = true
             task.wait(1/60*5)
             self.SkipCD = false
@@ -115,6 +123,47 @@ Core.Spells:AddSpell('Fire', 'Blaze Column',
         if distance > 200 then Core.Player.PrimaryPart.CFrame = oldCFrame end
     end
 )
+
+Core.Spells:AddSpell('Storm', 'Lightning Barrage', nil, 
+    function(elementName, abilityName, self)
+        local p1 = self.SpellsTarget.PrimaryPart.Position
+        local v1 = self.SpellsTarget.Velocity
+
+        local direction = {["Direction"] = CFrame.new(p1 + Vector3.new(0, 250, 0) + v1*.3, p1 + v1*.3)}
+
+        DoMagic:InvokeServer(elementName, abilityName, direction)
+    end
+)
+
+Core.Spells:AddSpell('Storm', 'Lightning Flash', nil, 
+    function(elementName, abilityName, self)
+        local additional = {
+            ["End"] = self.LocalComponent.Mouse.Hit.Position,
+            ["Origin"] = self.SpellsTarget.PrimaryPart.Position
+        }
+
+        DoMagic:InvokeServer(elementName, abilityName, additional)
+    end
+)
+
+--[[
+
+spellsLibrary['Event']['Lightning Barrage'] = function(Args, newSpells, localPlayer)
+    delayArgs = Args
+
+    task.delay(.1, function()
+
+        local p1 = newSpells.SpellsTarget.PrimaryPart.Position
+        local v1 = newSpells.SpellsTarget.Velocity
+
+        delayArgs[3] = {["Direction"] = CFrame.new(p1 + Vector3.new(0, 250, 0) + v1*.3, p1 + v1*.3)}
+        DoMagic:InvokeServer(unpack(delayArgs))
+    end)
+
+    return Args
+end
+
+]]
 
 Core.Pannel:CreateCommand('ModifySpell', 'SpellName', Core.Spells:GetAvaliableSpells(), 'modifies a certain spell', function(...)
     Core.Spells:ModifySpell(table.concat({...}, ' '))

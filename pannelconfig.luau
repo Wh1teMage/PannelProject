@@ -97,6 +97,28 @@ _G.Offsets = { -- easier to debug
     ['Poison Needles Hold'] = 1.8,
     ['Poison Needles'] = 1.3,
 
+	['Consecutive Fire Bullets Hold'] = 1.8,
+	['Consecutive Fire Bullets'] = 1.3,
+
+	['Water Stream Hold'] = 1.2,
+	['Water Stream'] = .7,
+
+	['Scorching Basalt Hold'] = 1.8,
+	['Scorching Basalt'] = .7,
+
+	['Flurry Heave Hold'] = 1.2,
+	['Flurry Heave'] = .4,
+
+	['Lucid Rift Hold'] = 1.5,
+	['Lucid Rift'] = .2,
+
+	['Somber Brisk Hold'] = 1.2,
+	['Somber Brisk'] = .3,
+
+	['Rainbowifier Maximizer Hold'] = 1.8,
+	['Rainbowifier Maximizer'] = .7,
+
+	['Crystalline Annihilation'] = 4,
     ['Great Tree of Abolition'] = 5,
 }
 
