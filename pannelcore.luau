@@ -1,6 +1,8 @@
-local PannelUI = require('./pannelUIv2')
-local Config   = require('./pannelconfig')
---local PannelUI   = loadstring(game:HttpGet("https://raw.githubusercontent.com/Wh1teMage/Pannel/refs/heads/main/PannelUI.lua"))()
+--local PannelUI = require('./pannelUIv2')
+--local Config   = require('./pannelconfig')
+
+local PannelUI   = loadstring(game:HttpGet("https://raw.githubusercontent.com/Wh1teMage/PannelProject/refs/heads/main/pannelUIv2.luau"))()
+local Config     = loadstring(game:HttpGet("https://raw.githubusercontent.com/Wh1teMage/PannelProject/refs/heads/main/pannelconfig.luau"))()
 
 local Players    = game:GetService("Players")
 local Replicated = game:GetService("ReplicatedStorage")

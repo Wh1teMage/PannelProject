@@ -1,5 +1,8 @@
-local Core   = require('./pannelcore')
-local Config = require('./pannelconfig')
+--local Core   = require('./pannelcore')
+--local Config = require('./pannelconfig')
+
+local Core       = loadstring(game:HttpGet("https://raw.githubusercontent.com/Wh1teMage/PannelProject/refs/heads/main/pannelcore.luau"))()
+local Config     = loadstring(game:HttpGet("https://raw.githubusercontent.com/Wh1teMage/PannelProject/refs/heads/main/pannelconfig.luau"))()
 
 local Players    = game:GetService("Players")
 local Replicated = game:GetService("ReplicatedStorage")
