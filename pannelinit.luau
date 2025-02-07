@@ -445,6 +445,38 @@ Core.Pannel:CreateCommand('SkipUltCDOnSpawn', 'Bool', {'true', 'false'}, 'enable
     Core.Spells.SkipUltCDOnSpawn = toboolean(bool)
 end)
 
+Core.Pannel:CreateCommand('ResetOnMana', 'Bool', {'true', 'false'}, 'enable / disable reset on selected mana level', function(bool)
+    Core.Player.ResetOnMana = toboolean(bool)
+end)
+
+Core.Pannel:CreateCommand('SetMinMana', 'Integer', {}, 'adjust minimal mana for reset', function(num)
+    Core.Player.MinMana = math.round(tonumber(num) or 100)
+end)
+
+Core.Pannel:CreateCommand('ChainSpell', 'SpellName', Core.Spells:GetAvaliableSpells(), 'adds a specific spell to the chain', function(...)
+    Core.Spells:ChainSpell(table.concat({...}, ' '))
+end)
+
+Core.Pannel:CreateCommand('UnchainSpell', 'SpellName', Core.Spells:GetAvaliableSpells(), 'removes a specific spell from the chain', function(...)
+    Core.Spells:UnchainSpell(table.concat({...}, ' '))
+end)
+
+Core.Pannel:CreateCommand('ClearChain', 'SpellName', Core.Spells:GetAvaliableSpells(), 'clears the chain', function()
+    Core.Spells:ClearChain()
+end)
+
+Core.Pannel:CreateCommand('DisableSpellAimbot', 'SpellName', Core.Config.ExistingSpells, 'excludes a specific spell', function(...)
+    Core.Spells:DisableSpellAimbot(table.concat({...}, ' '))
+end)
+
+Core.Pannel:CreateCommand('EnableSpellAimbot', 'SpellName', Core.Config.ExistingSpells, 'includes a specific spell', function(...)
+    Core.Spells:EnableSpellAimbot(table.concat({...}, ' '))
+end)
+
+Core.Pannel:CreateCommand('ClearSpellAimbot', 'SpellName', Core.Config.ExistingSpells, 'clears the blacklist', function()
+    Core.Spells:ClearSpellAimbot()
+end)
+
 --** Initialization
 
 local function updatePlayerVelocity(self, dt)

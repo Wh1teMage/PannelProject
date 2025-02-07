@@ -6,6 +6,7 @@ local Config     = loadstring(game:HttpGet("https://raw.githubusercontent.com/Wh
 
 local Players    = game:GetService("Players")
 local Replicated = game:GetService("ReplicatedStorage")
+local StarterGui = game:GetService("StarterGui")
 local UserInput  = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 --local TPService  = game:GetService("TeleportService")
@@ -443,6 +444,7 @@ function LocalFabric.new(playerObj)
     self['JumpPower']   = 50
     self['MaxFlySpeed'] = 100
     self['FlySpeed']    = 0
+    self['MinMana']     = 100
     self['Spawnpoint']  = CFrame.new(0,0,0)
     self['PreviousCF']  = CFrame.new(0,0,0)
 
@@ -861,6 +863,32 @@ function SpellMethods:RevertSpell(abilityName: string)
     Pannel:CreateNotification('Revertedd Successfully!', abilityName..' was correctly reverted', 5)
 end
 
+function SpellMethods:DisableSpellAimbot(abilityName: string)
+    if (not table.find(Config.ExistingSpells, abilityName)) then return end
+    Config.Spells['Disabled'][abilityName] = true
+end
+
+function SpellMethods:ChainSpell(abilityName: string)
+    if (not table.find(Config.ExistingSpells, abilityName)) then return end
+    Config.Spells['Chained'][abilityName] = true
+end
+
+function SpellMethods:EnableSpellAimbot(abilityName: string)
+    Config.Spells['Disabled'][abilityName] = nil
+end
+
+function SpellMethods:UnchainSpell(abilityName: string)
+    Config.Spells['Chained'][abilityName] = nil
+end
+
+function SpellMethods:ClearChain()
+    table.clear(Config.Spells['Chained'])
+end
+
+function SpellMethods:ClearSpellAimbot()
+    table.clear(Config.Spells['Disabled'])
+end
+
 function SpellMethods:GetAvaliableSpells()
     local spells = {}
 
@@ -1057,6 +1085,20 @@ function SpellMethods:PredictPosition()
     ]]
 end
 
+function SpellMethods:GetElementBySpellName(abilityName: string)
+    local selectedUI;
+
+    for _, v in ipairs(StarterGui.Main.Character.Available.ScrollingFrame.Frame:GetChildren()) do 
+        if (v.Name == abilityName) then selectedUI = abilityName; break; end
+    end
+
+    local element = self:GetElement(selectedUI.BackgroundColor3)
+    print(element)
+    if (not element) then return end
+
+    return element
+end
+
 function SpellMethods:GetSpellInfo() -- do later
     local selectedUI = self:GetEquippedSpell() :: ImageButton
     print(selectedUI)
@@ -1086,9 +1128,9 @@ function SpellFabric.new(localPlayer)
     self.PredictedPosition = Vector3.new(0,0,0)
     self.PredictedVelocity = Vector3.new(0,0,0)
 
-    self.SkipCD      = false
-    self.AimbotState = false
-    self.AutoPunch   = false
+    self.SkipCD       = false
+    self.IgnoreAimbot = false
+    self.AutoPunch    = false
 
     self.AimFilter = false
     self.ApplyPing = 1
@@ -1107,7 +1149,7 @@ function SpellFabric.new(localPlayer)
             return
         end
 
-        if (self.LocalComponent.Aimbot) then 
+        if (self.LocalComponent.Aimbot and not self.IgnoreAimbot) then 
             ClientData:FireServer({['Cooldowns'] = "{}", ['Mouse'] = self.PredictedPosition, ['Holding'] = true, ['Camera'] = self.LocalComponent.PrimaryPart.Position})
             return
         end
@@ -1127,6 +1169,10 @@ function SpellFabric.new(localPlayer)
             self.AimFilter = Config.Offsets.LockFilter[spellName]
             self.Velocity  = Config.Offsets.ProjectileSpeed[spellName] or Config.Offsets.ProjectileSpeed['Default']
 
+            if (Config.Spells.Disabled[spellName]) then
+                self.IgnoreAimbot = true
+            end
+
             print(Config.Spells.Modified[spellName])
             if (not Config.Spells.Modified[spellName]) then return end
             self:UseSpell(element, spellName)
@@ -1141,6 +1187,10 @@ function SpellFabric.new(localPlayer)
 
             self.AimFilter = Config.Offsets.LockFilter[spellName]
             self.Velocity  = Config.Offsets.ProjectileSpeed[spellName] or Config.Offsets.ProjectileSpeed['Default']
+
+            if (Config.Spells.Disabled[spellName]) then
+                self.IgnoreAimbot = true
+            end
         end
 
         if (input.KeyCode == self.LocalComponent.Binds['SkipCD']) then
@@ -1150,11 +1200,38 @@ function SpellFabric.new(localPlayer)
         end
     end)
 
+    UserInput.InputEnded:Connect(function(input, event)
+        if (input.KeyCode == self.LocalComponent.Binds['UseSpell'] or input.UserInputType == Enum.UserInputType.MouseButton1) then
+            local element, spellName = self:GetSpellInfo()
+            if (not element) then return end
+
+            if (not Config.Spells.Disabled[spellName]) then return end
+            task.delay(1, function()
+                self.IgnoreAimbot = false
+            end)
+        end
+    end)
+
     self.LocalComponent.Instance.CharacterAdded:Connect(function()
         if (not self.SkipUltCDOnSpawn) then return end
-        task.wait(.5)
+        task.wait(1)
         self:SkipUltCD()
     end)
+
+    while task.wait(1/10) do
+
+        if (self.LocalComponent.ResetOnMana and self.LocalComponent.Mana < self.LocalComponent.MinMana) then
+            self.LocalComponent.Health = 0
+        end
+
+        for _, spellName in ipairs(Config.Spells.Chained) do                     --*please use cache here
+            local element = self:GetElementBySpellName(spellName)
+            if (not element) then continue end
+
+            if (not Config.Spells.Modified[spellName]) then return end
+            self:UseSpell(element, spellName)
+        end
+    end
 
     return self
 end
