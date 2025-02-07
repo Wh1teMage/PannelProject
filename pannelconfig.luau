@@ -88,6 +88,10 @@ _G.Offsets = { -- easier to debug
         ['Poison Needles'] = 700,
     },
 
+	['LockFilter'] = {
+        ['Poison Needles'] = true,
+    },
+
     ['Distance'] = 50,
 
     ['Plasma Missiles Hold'] = 1.8,
@@ -107,7 +111,7 @@ _G.Offsets = { -- easier to debug
 	['Scorching Basalt'] = .7,
 
 	['Flurry Heave Hold'] = 1.2,
-	['Flurry Heave'] = .4,
+	['Flurry Heave'] = .7,
 
 	['Lucid Rift Hold'] = 1.5,
 	['Lucid Rift'] = .2,

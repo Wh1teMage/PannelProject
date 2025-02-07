@@ -486,6 +486,13 @@ function LocalFabric.new(playerObj)
         [Enum.KeyCode.D] = 0,
     }
 
+    self['Binds'] = 
+    {
+        ['UseSpell'] = Enum.KeyCode.E,
+        ['SkipCD']   = Enum.KeyCode.F,
+        ['ClickTP']  = Enum.KeyCode.T,
+    }
+
     self['bodyVelocity'] = Instance.new("BodyVelocity")
     self['bodyGyro']     = Instance.new("BodyGyro")
 
@@ -551,6 +558,14 @@ function LocalFabric.new(playerObj)
 
     UserInput.InputBegan:Connect(function(input, event) self:ChangeAmplifiers(input.KeyCode, event, 1) end)
     UserInput.InputEnded:Connect(function(input, event) self:ChangeAmplifiers(input.KeyCode, event, 0) end)
+
+    UserInput.InputBegan:Connect(function(input, event)
+        if (event) then return end
+
+        if (input.KeyCode == self['Binds']['ClickTP']) then
+            self:ClickTPFunction()
+        end
+    end)
 
     return self :: typeof(self) & typeof(LocalMethods) & typeof(component)
 end
@@ -672,7 +687,8 @@ function GUIFabric.new(localPlayer)
 
     localPlayer.PlayerGui.ChildAdded:Connect(function(child)
         if (child:IsAncestorOf(Pannel.ScreenGui)) then return end
-        if not ((child.Name == "ScreenGui" or child.Name == "ef" or child.Name == "efult") and localPlayer.AntiBlind == true) then return end
+        if (not localPlayer.AntiBlind) then return end
+        if (not (child.Name == "ScreenGui" or child.Name == "ef" or child.Name == "efult")) then return end
 
         child.Enabled = false
         localPlayer.PlayerGui.Chat.Enabled = true
@@ -712,6 +728,7 @@ function SpellMethods:GetSpellsTargetByType()
     end
 
     if (not self.SpellsTarget) then self.SpellsTarget = self.LocalComponent end
+    self.LocalComponent.SelectedTarget = self.SpellsTarget
 end
 
 function SpellMethods:TPCharacterBySpellType(oldCFrame)
@@ -1005,7 +1022,7 @@ function SpellMethods:PredictPosition()
 		self.PredictedPosition = oldPosition
 	end
 
-	if (willHit and os.clock() - locked > 0) then
+	if (self.AimFilter and willHit and os.clock() - locked > 0) then
 		locked = os.clock() + predtime * 1.2
 
         --predtime -= pingOffset
@@ -1039,8 +1056,20 @@ function SpellMethods:PredictPosition()
     ]]
 end
 
-function SpellMethods:AdjustVelocity() -- do later
-    
+function SpellMethods:GetSpellInfo() -- do later
+    local selectedUI = self:GetEquippedSpell() :: ImageButton
+    print(selectedUI)
+    if (not selectedUI) then return end
+
+    local spellName = self:GetSpellNameByImageAndColor(selectedUI.Image, selectedUI.BackgroundColor3)
+    print(spellName)
+    if (not spellName) then return end
+
+    local element = self:GetElement(selectedUI.BackgroundColor3)
+    print(element)
+    if (not element) then return end
+
+    return element, spellName
 end
 
 function SpellFabric.new(localPlayer)
@@ -1051,8 +1080,8 @@ function SpellFabric.new(localPlayer)
     self.SelectedType   = Config.Enums.Target.Target
     self.TPType         = Config.Enums.TPType.Swap
     self.SpellsTarget   = localPlayer
-
     self.Velocity       = 700
+
     self.PredictedPosition = Vector3.new(0,0,0)
     self.PredictedVelocity = Vector3.new(0,0,0)
 
@@ -1060,7 +1089,6 @@ function SpellFabric.new(localPlayer)
     self.AimbotState = false
 
     self.AimFilter = false
-    self.AdaptVelocity = false
 
     RunService.Heartbeat:Connect(function()
         self:GetSpellsTargetByType()
@@ -1084,40 +1112,30 @@ function SpellFabric.new(localPlayer)
     UserInput.InputBegan:Connect(function(input, event)
         print(input.KeyCode, event)
         if event then return end
-        if (input.KeyCode == Enum.KeyCode.E) then
-            local selectedUI = self:GetEquippedSpell() :: ImageButton
-            print(selectedUI)
-            if (not selectedUI) then return end
-
-            local spellName = self:GetSpellNameByImageAndColor(selectedUI.Image, selectedUI.BackgroundColor3)
-            print(spellName)
-            if (not spellName) then return end
-
-            local element = self:GetElement(selectedUI.BackgroundColor3)
-            print(element)
+        if (input.KeyCode == self.LocalComponent.Binds['UseSpell']) then
+            local element, spellName = self:GetSpellInfo()
             if (not element) then return end
 
             print(Config.Spells.Modified[spellName])
             if (not Config.Spells.Modified[spellName]) then return end
             self:UseSpell(element, spellName)
-            self.AdaptVelocity = true
         end
 
         if (input.UserInputType == Enum.UserInputType.MouseButton1) then
-            self.AdaptVelocity = true
+            self.AimFilter = false
+            self.Velocity  = Config.GeneralInfo.ProjectileSpeed['Default']
+
+            local element, spellName = self:GetSpellInfo()
+            if (not element) then return end
+
+            self.AimFilter = Config.GeneralInfo.LockFilter[spellName]
+            self.Velocity  = Config.GeneralInfo.ProjectileSpeed[spellName] or Config.GeneralInfo.ProjectileSpeed['Default']
         end
 
-        if (input.KeyCode == Enum.KeyCode.F) then
+        if (input.KeyCode == self.LocalComponent.Binds['SkipCD']) then
             self.SkipCD = true
-            task.wait(.5)
+            task.wait(.1)
             self.SkipCD = false
-        end
-    end)
-
-    UserInput.InputEnded:Connect(function(input, event)
-        if (event) then return end
-        if (input.KeyCode == Enum.KeyCode.E or input.UserInputType == Enum.UserInputType.MouseButton1) then
-            self.AdaptVelocity = false
         end
     end)
 

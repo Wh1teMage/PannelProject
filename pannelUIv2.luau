@@ -609,7 +609,7 @@ function CommandHelperFabric.ChangeCommandHelperSize(self: IPannel)
 	end)
 
 	TweenService:Create(holder, info, {
-		Position = UDim2.fromOffset(0, -14-amount*30),
+		Position = UDim2.fromOffset(0, -14-math.min(300, amount*30)),
 		Size = UDim2.fromOffset(500, math.min(300, 10+amount*30)),
 	}):Play()
 

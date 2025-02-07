@@ -124,6 +124,8 @@ Core.Spells:AddSpell('Fire', 'Blaze Column',
     end
 )
 
+Core.Spells:CloneSpell('Grass', 'Vine Trap', 'Fire', 'Blaze Column')
+
 Core.Spells:AddSpell('Storm', 'Lightning Barrage', nil, 
     function(elementName, abilityName, self)
         local p1 = self.SpellsTarget.PrimaryPart.Position
@@ -139,31 +141,83 @@ Core.Spells:AddSpell('Storm', 'Lightning Flash', nil,
     function(elementName, abilityName, self)
         local additional = {
             ["End"] = self.LocalComponent.Mouse.Hit.Position,
-            ["Origin"] = self.SpellsTarget.PrimaryPart.Position
+            ["Origin"] = self.LocalComponent.PrimaryPart.Position
         }
 
         DoMagic:InvokeServer(elementName, abilityName, additional)
     end
 )
 
---[[
+Core.Spells:AddSpell('Light', 'Orbs of Enlightenment', nil, 
+    function(elementName, abilityName, self)
+        local p1 = self.SpellsTarget.PrimaryPart.Position
+        local v1 = self.SpellsTarget.Velocity
 
-spellsLibrary['Event']['Lightning Barrage'] = function(Args, newSpells, localPlayer)
-    delayArgs = Args
+        local additional = {['Origin'] = p1 + v1*.15 + Vector3.new(0, -2, 0), ['Coordinates'] = {}}
+        for i=1, 50 do table.insert(additional['Coordinates'], CFrame.new(p1 + v1*.15)) end
 
-    task.delay(.1, function()
+        DoMagic:InvokeServer(elementName, abilityName, additional)
+    end
+)
 
-        local p1 = newSpells.SpellsTarget.PrimaryPart.Position
-        local v1 = newSpells.SpellsTarget.Velocity
+Core.Spells:CloneSpell('Earth', 'Rocks Avalanche', 'Light', 'Orbs of Enlightenment')
 
-        delayArgs[3] = {["Direction"] = CFrame.new(p1 + Vector3.new(0, 250, 0) + v1*.3, p1 + v1*.3)}
-        DoMagic:InvokeServer(unpack(delayArgs))
-    end)
+Core.Spells:AddSpell('Spirit', 'Vigor Gyration', nil, 
+    function(elementName, abilityName, self)
+        local p1 = self.SpellsTarget.PrimaryPart.Position
+        local v1 = self.SpellsTarget.Velocity
+    
+        local additional = {}
+        for i=1, 50 do table.insert(additional, CFrame.new(p1 + v1*.15 + self.SpellsTarget.PrimaryPart.CFrame.UpVector * -3.5, p1 + v1*.15)) end
 
-    return Args
-end
+        DoMagic:InvokeServer(elementName, abilityName, additional)
+    end
+)
 
-]]
+Core.Spells:CloneSpell('Space', 'Asteroid Belt', 'Spirit', 'Vigor Gyration')
+
+Core.Spells:AddSpell('Lava', 'Magma Drop', 
+    function(elementName, abilityName, self)
+        local oldCFrame = self.LocalComponent.PrimaryPart.CFrame
+    
+        for i=1, 5 do
+            self.LocalComponent.PrimaryPart.CFrame = CFrame.new(self.SpellsTarget.PrimaryPart.Position + self.SpellsTarget.Velocity*.3)
+            task.wait(.02)
+        end
+
+        DoClientMagic:FireServer(elementName, abilityName)
+
+        task.delay(.5, function()
+            self.LocalComponent.PrimaryPart.CFrame = oldCFrame
+        end)
+    end, 
+    function(elementName, abilityName, self)
+        local additional = {['nearestPlayer'] = self.SpellsTarget.SpellsTarget.Instance}
+        DoMagic:InvokeServer(elementName, abilityName, additional)
+    end
+)
+
+Core.Spells:CloneSpell('Time', 'Temporal Trap', 'Lava', 'Magma Drop')
+Core.Spells:CloneSpell('Ice', 'Frozen Incursion', 'Lava', 'Magma Drop')
+Core.Spells:CloneSpell('Darkness', 'Void of Terror', 'Lava', 'Magma Drop')
+Core.Spells:CloneSpell('Void', 'Void Lightning', 'Lava', 'Magma Drop')
+Core.Spells:CloneSpell('Space', 'Neutron Punch', 'Lava', 'Magma Drop')
+Core.Spells:CloneSpell('Pheonix', 'Soul Plunge', 'Lava', 'Magma Drop')
+Core.Spells:CloneSpell('Dragon', 'Fuming Whack', 'Lava', 'Magma Drop')
+
+Core.Spells:AddSpell('Water', 'Water Beam', nil, 
+    function(elementName, abilityName, self)
+        local p1 = self.SpellsTarget.PrimaryPart.Position
+        local v1 = self.SpellsTarget.Velocity
+    
+        local additional = {["Origin"] = (p1 - self.PredictedPosition).Unit * 12 + p1 + v1*.3}
+
+        DoMagic:InvokeServer(elementName, abilityName, additional)
+    end
+)
+
+Core.Spells:CloneSpell('Grass', 'Vine', 'Water', 'Water Beam')
+Core.Spells:CloneSpell('Light', 'Auroral Blast', 'Water', 'Water Beam')
 
 Core.Pannel:CreateCommand('ModifySpell', 'SpellName', Core.Spells:GetAvaliableSpells(), 'modifies a certain spell', function(...)
     Core.Spells:ModifySpell(table.concat({...}, ' '))
@@ -220,6 +274,10 @@ end)
 
 Core.Pannel:CreateCommand('AntiBlind', 'Bool', {'true', 'false'}, 'enable / disable antiblind', function(bool)
     Core.Player.AntiBlind = toboolean(bool)
+end)
+
+Core.Pannel:CreateCommand('AntiStun', 'Bool', {'true', 'false'}, 'enable / disable antistun', function(bool)
+    Core.Player.AntiStun = toboolean(bool)
 end)
 
 Core.Pannel:CreateCommand('Invisible', 'Bool', {'true', 'false'}, 'enable / disable invisibility', function(bool)
