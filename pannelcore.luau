@@ -926,7 +926,7 @@ function SpellMethods:PredictPosition()
 	end
 
 	local applyGravity = 0
-    local pingOffset = self.LocalComponent.Ping/1000 * 2
+    local pingOffset = self.LocalComponent.Ping/1000 * 2 * self.ApplyPing
 
 	if (self.SpellsTarget.Humanoid.FloorMaterial == Enum.Material.Air) then
 		applyGravity = 1
@@ -1091,6 +1091,7 @@ function SpellFabric.new(localPlayer)
     self.AimbotState = false
 
     self.AimFilter = false
+    self.ApplyPing = 1
 
     RunService.Heartbeat:Connect(function()
         self:GetSpellsTargetByType()

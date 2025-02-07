@@ -217,7 +217,13 @@ Core.Spells:AddSpell('Water', 'Water Beam', nil,
         local p1 = self.SpellsTarget.PrimaryPart.Position
         local v1 = self.SpellsTarget.Velocity
     
+        self.ApplyPing = 0
+
         local additional = {["Origin"] = (p1 - self.PredictedPosition).Unit * 12 + p1 + v1*.3 + Vector3.new(0, 5, 0)}
+
+        task.delay(.5, function()
+            self.ApplyPing = 1
+        end)
 
         DoMagic:InvokeServer(elementName, abilityName, additional)
     end
@@ -254,7 +260,14 @@ Core.Spells:AddSpell('Storm', 'Lightning Bolt', nil,
         local p1 = self.SpellsTarget.PrimaryPart.Position
         --local v1 = self.SpellsTarget.Velocity
 
+        self.ApplyPing = 0
+
         local newOrigin = {["Origin"] = p1 + Vector3.new(0, 5, 0)} --(p1 - self.LocalComponent.Mouse.Hit.Position).Unit * 12 + p1 + v1*.2
+
+        task.delay(.5, function()
+            self.ApplyPing = 1
+        end)
+
         DoMagic:InvokeServer(elementName, abilityName, newOrigin)
     end
 )
@@ -269,9 +282,9 @@ Core.Spells:AddSpell('Chaos', 'Disorder Ignition',
     function(elementName, abilityName, self)
         local oldCFrame = self.LocalComponent.PrimaryPart.CFrame
     
-        for i=1, 5 do
-            self.LocalComponent.PrimaryPart.CFrame = CFrame.new(self.SpellsTarget.PrimaryPart.Position + self.SpellsTarget.Velocity*.3)
-            task.wait(.02)
+        for i = 1, 30 do
+            self.LocalComponent.PrimaryPart.CFrame = CFrame.new(self.SpellsTarget.PrimaryPart.Position)
+            task.wait()
         end
 
         DoClientMagic:FireServer(elementName, abilityName)
@@ -285,7 +298,7 @@ Core.Spells:AddSpell('Chaos', 'Disorder Ignition',
         end)
     end, 
     function(elementName, abilityName, self)
-        local additional = {['nearestPlayer'] = self.SpellsTarget.SpellsTarget.Instance}
+        local additional = {['nearestPlayer'] = self.SpellsTarget.Instance}
         DoMagic:InvokeServer(elementName, abilityName, additional)
     end
 )
