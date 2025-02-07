@@ -1123,13 +1123,13 @@ function SpellFabric.new(localPlayer)
 
         if (input.UserInputType == Enum.UserInputType.MouseButton1) then
             self.AimFilter = false
-            self.Velocity  = Config.GeneralInfo.ProjectileSpeed['Default']
+            self.Velocity  = Config.Offsets.ProjectileSpeed['Default']
 
             local element, spellName = self:GetSpellInfo()
             if (not element) then return end
 
-            self.AimFilter = Config.GeneralInfo.LockFilter[spellName]
-            self.Velocity  = Config.GeneralInfo.ProjectileSpeed[spellName] or Config.GeneralInfo.ProjectileSpeed['Default']
+            self.AimFilter = Config.Offsets.LockFilter[spellName]
+            self.Velocity  = Config.Offsets.ProjectileSpeed[spellName] or Config.Offsets.ProjectileSpeed['Default']
         end
 
         if (input.KeyCode == self.LocalComponent.Binds['SkipCD']) then

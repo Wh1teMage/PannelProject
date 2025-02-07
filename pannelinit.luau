@@ -81,7 +81,7 @@ Core.Spells:CloneSpell('Lava', 'Scorching Basalt', 'Grass', 'Poison Needles')
 Core.Spells:CloneSpell('Ice', 'Flurry Heave', 'Grass', 'Poison Needles')
 Core.Spells:CloneSpell('Crystal', 'Lucid Rift', 'Grass', 'Poison Needles')
 Core.Spells:CloneSpell('Darkness', 'Somber Brisk', 'Grass', 'Poison Needles')
-Core.Spells:CloneSpell('spectrum', 'Rainbowifier Maximizer', 'Grass', 'Poison Needles')
+Core.Spells:CloneSpell('Spectrum', 'Rainbowifier Maximizer', 'Grass', 'Poison Needles')
 
 Core.Spells:AddSpell('Crystal', 'Crystalline Annihilation', 
     function(elementName, abilityName, self)
