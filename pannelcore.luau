@@ -831,8 +831,10 @@ function SpellMethods:UseSpell(elementName: string, abilityName: string)
     local ability = Config.SpellsLibrary[elementName][abilityName]
     if (not ability) then return end
 
+    ClientData:FireServer({['Cooldowns'] = "{}", ['Mouse'] = self.PredictedPosition, ['Holding'] = true, ['Camera'] = self.LocalComponent.PrimaryPart.Position})
     ability['Event'](elementName, abilityName, self)
     task.wait(1/60*3)
+    ClientData:FireServer({['Cooldowns'] = "{}", ['Mouse'] = self.PredictedPosition, ['Holding'] = true, ['Camera'] = self.LocalComponent.PrimaryPart.Position})
     ability['Function'](elementName, abilityName, self)
 end
 
@@ -1113,8 +1115,14 @@ function SpellFabric.new(localPlayer)
         --print(input.KeyCode, event)
         --if event then return end
         if (input.KeyCode == self.LocalComponent.Binds['UseSpell']) then
+            self.AimFilter = false
+            self.Velocity  = Config.Offsets.ProjectileSpeed['Default']
+
             local element, spellName = self:GetSpellInfo()
             if (not element) then return end
+
+            self.AimFilter = Config.Offsets.LockFilter[spellName]
+            self.Velocity  = Config.Offsets.ProjectileSpeed[spellName] or Config.Offsets.ProjectileSpeed['Default']
 
             print(Config.Spells.Modified[spellName])
             if (not Config.Spells.Modified[spellName]) then return end

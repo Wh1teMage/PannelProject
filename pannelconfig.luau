@@ -86,6 +86,10 @@ _G.Offsets = { -- easier to debug
     ['ProjectileSpeed'] = {
         ['Default'] = 300,
         ['Poison Needles'] = 700,
+		['Plasma Missiles'] = 2000,
+		['Lightning Bolt'] = 2000,
+		['Lightning Ray'] = 4000,
+		['Rock Fist'] = 2000,
     },
 
 	['LockFilter'] = {
@@ -93,6 +97,9 @@ _G.Offsets = { -- easier to debug
     },
 
     ['Distance'] = 50,
+
+    ['Plasma Ray Hold'] = 1.8,
+    ['Plasma Ray'] = 1.3,
 
     ['Plasma Missiles Hold'] = 1.8,
     ['Plasma Missiles'] = 2.4,
@@ -102,10 +109,10 @@ _G.Offsets = { -- easier to debug
     ['Poison Needles'] = 1.3,
 
 	['Consecutive Fire Bullets Hold'] = 1.8,
-	['Consecutive Fire Bullets'] = 1.3,
+	['Consecutive Fire Bullets'] = 1,
 
 	['Water Stream Hold'] = 1.2,
-	['Water Stream'] = .7,
+	['Water Stream'] = .6,
 
 	['Scorching Basalt Hold'] = 1.8,
 	['Scorching Basalt'] = .7,
@@ -121,6 +128,9 @@ _G.Offsets = { -- easier to debug
 
 	['Rainbowifier Maximizer Hold'] = 1.8,
 	['Rainbowifier Maximizer'] = .7,
+
+	['Orbs of Enlightenment'] = .3,
+	['Rocks Avalanche'] = .2,
 
 	['Crystalline Annihilation'] = 4,
     ['Great Tree of Abolition'] = 5,

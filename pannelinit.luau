@@ -75,6 +75,7 @@ Core.Spells:AddSpell('Grass', 'Poison Needles',
     end
 )
 
+Core.Spells:CloneSpell('Plasma', 'Plasma Ray', 'Grass', 'Poison Needles')
 Core.Spells:CloneSpell('Fire', 'Consecutive Fire Bullets', 'Grass', 'Poison Needles')
 Core.Spells:CloneSpell('Water', 'Water Stream', 'Grass', 'Poison Needles')
 Core.Spells:CloneSpell('Lava', 'Scorching Basalt', 'Grass', 'Poison Needles')
@@ -124,7 +125,7 @@ Core.Spells:AddSpell('Fire', 'Blaze Column',
     end
 )
 
-Core.Spells:CloneSpell('Grass', 'Vine Trap', 'Fire', 'Blaze Column')
+Core.Spells:CloneSpell('Nature', 'Vine Trap', 'Fire', 'Blaze Column')
 
 Core.Spells:AddSpell('Storm', 'Lightning Barrage', nil, 
     function(elementName, abilityName, self)
@@ -156,6 +157,12 @@ Core.Spells:AddSpell('Light', 'Orbs of Enlightenment', nil,
         local additional = {['Origin'] = p1 + v1*.15 + Vector3.new(0, -2, 0), ['Coordinates'] = {}}
         for i=1, 50 do table.insert(additional['Coordinates'], CFrame.new(p1 + v1*.15)) end
 
+        task.delay(_G.Offsets[abilityName], function()
+            self.SkipCD = true
+            task.wait(1/60*5)
+            self.SkipCD = false
+        end)
+
         DoMagic:InvokeServer(elementName, abilityName, additional)
     end
 )
@@ -180,9 +187,9 @@ Core.Spells:AddSpell('Lava', 'Magma Drop',
     function(elementName, abilityName, self)
         local oldCFrame = self.LocalComponent.PrimaryPart.CFrame
     
-        for i=1, 5 do
-            self.LocalComponent.PrimaryPart.CFrame = CFrame.new(self.SpellsTarget.PrimaryPart.Position + self.SpellsTarget.Velocity*.3)
-            task.wait(.02)
+        for i=1, 10 do
+            self.LocalComponent.PrimaryPart.CFrame = CFrame.new(self.SpellsTarget.PrimaryPart.Position)
+            task.wait()
         end
 
         DoClientMagic:FireServer(elementName, abilityName)
@@ -192,7 +199,7 @@ Core.Spells:AddSpell('Lava', 'Magma Drop',
         end)
     end, 
     function(elementName, abilityName, self)
-        local additional = {['nearestPlayer'] = self.SpellsTarget.SpellsTarget.Instance}
+        local additional = {['nearestPlayer'] = self.SpellsTarget.Instance}
         DoMagic:InvokeServer(elementName, abilityName, additional)
     end
 )
@@ -210,7 +217,7 @@ Core.Spells:AddSpell('Water', 'Water Beam', nil,
         local p1 = self.SpellsTarget.PrimaryPart.Position
         local v1 = self.SpellsTarget.Velocity
     
-        local additional = {["Origin"] = (p1 - self.PredictedPosition).Unit * 12 + p1 + v1*.3}
+        local additional = {["Origin"] = (p1 - self.PredictedPosition).Unit * 12 + p1 + v1*.3 + Vector3.new(0, 5, 0)}
 
         DoMagic:InvokeServer(elementName, abilityName, additional)
     end
@@ -245,9 +252,9 @@ Core.Spells:CloneSpell('Earth', 'Rock Fist', 'Storm', 'Lightning Dispersion')
 Core.Spells:AddSpell('Storm', 'Lightning Bolt', nil,
     function(elementName, abilityName, self)
         local p1 = self.SpellsTarget.PrimaryPart.Position
-        local v1 = self.SpellsTarget.Velocity
+        --local v1 = self.SpellsTarget.Velocity
 
-        local newOrigin = {["Origin"] = (p1 - self.LocalComponent.Mouse.Hit.Position).Unit * 12 + p1 + v1*.2}
+        local newOrigin = {["Origin"] = p1 + Vector3.new(0, 5, 0)} --(p1 - self.LocalComponent.Mouse.Hit.Position).Unit * 12 + p1 + v1*.2
         DoMagic:InvokeServer(elementName, abilityName, newOrigin)
     end
 )
@@ -402,6 +409,10 @@ end)
 
 Core.Pannel:CreateCommand('Teleport', '', {}, 'teleport to selected target', function()
     Core.Player:TeleportFunction()
+end)
+
+Core.Pannel:CreateCommand('SkipUltCD', '', {}, 'unlocks the ultimate after resetting', function()
+    Core.Spells:SkipUltCD()
 end)
 
 --** Initialization
