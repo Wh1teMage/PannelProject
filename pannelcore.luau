@@ -1110,8 +1110,8 @@ function SpellFabric.new(localPlayer)
     end)
 
     UserInput.InputBegan:Connect(function(input, event)
-        print(input.KeyCode, event)
-        if event then return end
+        --print(input.KeyCode, event)
+        --if event then return end
         if (input.KeyCode == self.LocalComponent.Binds['UseSpell']) then
             local element, spellName = self:GetSpellInfo()
             if (not element) then return end

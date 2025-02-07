@@ -219,6 +219,106 @@ Core.Spells:AddSpell('Water', 'Water Beam', nil,
 Core.Spells:CloneSpell('Grass', 'Vine', 'Water', 'Water Beam')
 Core.Spells:CloneSpell('Light', 'Auroral Blast', 'Water', 'Water Beam')
 
+Core.Spells:AddSpell('Dragon', 'Formidable Roar', nil,
+    function(elementName, abilityName, self)
+        local p1 = self.SpellsTarget.PrimaryPart.Position
+        local v1 = self.SpellsTarget.Velocity
+
+        local additional = 
+        {
+            [1] = CFrame.new(p1 + v1*.4),
+            [2] = 9e9,
+        }
+
+        DoMagic:InvokeServer(elementName, abilityName, additional)
+    end
+)
+
+Core.Spells:AddSpell('Storm', 'Lightning Dispersion', nil,
+    function(elementName, abilityName, self)
+        DoMagic:InvokeServer(elementName, abilityName, {['Grounded'] = true})
+    end
+)
+
+Core.Spells:CloneSpell('Earth', 'Rock Fist', 'Storm', 'Lightning Dispersion')
+
+Core.Spells:AddSpell('Storm', 'Lightning Bolt', nil,
+    function(elementName, abilityName, self)
+        local p1 = self.SpellsTarget.PrimaryPart.Position
+        local v1 = self.SpellsTarget.Velocity
+
+        local newOrigin = {["Origin"] = (p1 - self.LocalComponent.Mouse.Hit.Position).Unit * 12 + p1 + v1*.2}
+        DoMagic:InvokeServer(elementName, abilityName, newOrigin)
+    end
+)
+
+Core.Spells:AddSpell('Gravity', 'Gravital Globe', nil,
+    function(elementName, abilityName, self)
+        DoMagic:InvokeServer(elementName, abilityName, {["lastPos"] = self.SpellsTarget.PrimaryPart.Position})
+    end
+)
+
+Core.Spells:AddSpell('Chaos', 'Disorder Ignition', 
+    function(elementName, abilityName, self)
+        local oldCFrame = self.LocalComponent.PrimaryPart.CFrame
+    
+        for i=1, 5 do
+            self.LocalComponent.PrimaryPart.CFrame = CFrame.new(self.SpellsTarget.PrimaryPart.Position + self.SpellsTarget.Velocity*.3)
+            task.wait(.02)
+        end
+
+        DoClientMagic:FireServer(elementName, abilityName)
+        
+        task.delay(2, function()
+            self:TPCharacterBySpellType(oldCFrame)
+            task.wait(.2)
+            KeyReserve:FireServer(Enum.KeyCode.Y)
+            task.wait(1)
+            self.LocalComponent.PrimaryPart.CFrame = oldCFrame
+        end)
+    end, 
+    function(elementName, abilityName, self)
+        local additional = {['nearestPlayer'] = self.SpellsTarget.SpellsTarget.Instance}
+        DoMagic:InvokeServer(elementName, abilityName, additional)
+    end
+)
+
+Core.Spells:AddSpell('Spirit', 'Essence Relegation', nil, nil)
+
+Core.Spells:AddSpell('Light', 'Amaurotic Lambent', nil, 
+    function(elementName, abilityName, self)
+        DoMagic:InvokeServer(elementName, abilityName, {['lastPos'] = self.SpellsTarget.PrimaryPart.CFrame.Position + self.SpellsTarget.Velocity*.3})
+    end
+)
+
+Core.Spells:AddSpell('Time', 'Genesis Ray', nil, 
+    function(elementName, abilityName, self)
+        DoMagic:InvokeServer(elementName, abilityName, {['charge'] = 9e9, ['lv'] = Vector3.new(0,0,0)})
+    end
+)
+
+Core.Spells:AddSpell('Gravity', 'Gravitational Field', nil, 
+    function(elementName, abilityName, self)
+        DoMagic:InvokeServer(elementName, abilityName, CFrame.new(self.SpellsTarget.PrimaryPart.Position + Vector3.new(0, 1000000, 0)))
+    end
+)
+
+Core.Spells:AddSpell('Acid', 'Sewer Burst', nil, 
+    function(elementName, abilityName, self)
+        local pos = self.SpellsTarget.PrimaryPart.Position
+
+        local additional =
+        {
+            ["Mouse"] = pos, 
+            ["Camera"] = pos + Vector3.new(0, 100, 0), 
+            ["Spawn"] = CFrame.new(pos), 
+            ["Origin"] = CFrame.new(pos) 
+        }
+
+        DoMagic:InvokeServer(elementName, abilityName, additional)
+    end
+)
+
 Core.Pannel:CreateCommand('ModifySpell', 'SpellName', Core.Spells:GetAvaliableSpells(), 'modifies a certain spell', function(...)
     Core.Spells:ModifySpell(table.concat({...}, ' '))
 end)
