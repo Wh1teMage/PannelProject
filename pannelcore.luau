@@ -1218,20 +1218,22 @@ function SpellFabric.new(localPlayer)
         self:SkipUltCD()
     end)
 
-    while task.wait(1/10) do
+    task.spawn(function()
+        while task.wait(1/10) do
 
-        if (self.LocalComponent.ResetOnMana and self.LocalComponent.Mana < self.LocalComponent.MinMana) then
-            self.LocalComponent.Health = 0
+            if (self.LocalComponent.ResetOnMana and self.LocalComponent.Mana < self.LocalComponent.MinMana) then
+                self.LocalComponent.Health = 0
+            end
+    
+            for _, spellName in ipairs(Config.Spells.Chained) do                     --*please use cache here
+                local element = self:GetElementBySpellName(spellName)
+                if (not element) then continue end
+    
+                if (not Config.Spells.Modified[spellName]) then return end
+                self:UseSpell(element, spellName)
+            end
         end
-
-        for _, spellName in ipairs(Config.Spells.Chained) do                     --*please use cache here
-            local element = self:GetElementBySpellName(spellName)
-            if (not element) then continue end
-
-            if (not Config.Spells.Modified[spellName]) then return end
-            self:UseSpell(element, spellName)
-        end
-    end
+    end)
 
     return self
 end
