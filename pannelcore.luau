@@ -86,7 +86,6 @@ function PlayerFabric.new(playerObj: Player)
     self.CFrame      = CFrame.new(0,0,0)
     self.ExtraCFrame = CFrame.new(0,0,0)
     self.Velocity    = Vector3.new(0,0,0)
-    self.Accel       = Vector3.new(0,0,0)
     self.LastTick    = os.clock()
 
     self.Velocities    = {}
@@ -97,8 +96,9 @@ function PlayerFabric.new(playerObj: Player)
     self.MaxVelocitiesSlow = 60
     self.VelocitySumSlow   = Vector3.new(0,0,0)
 
-    self.Accelerations  = {}
+    self.Accelerations   = {}
     self.AccelerationSum = Vector3.new(0,0,0)
+    self.Acceleration    = Vector3.new(0,0,0)
 
     self.Positions    = {}
     self.MaxPositions = 5
