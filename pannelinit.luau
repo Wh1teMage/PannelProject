@@ -339,6 +339,19 @@ Core.Spells:AddSpell('Acid', 'Sewer Burst', nil,
     end
 )
 
+Core.Spells:AddSpell('Light', 'Ablaze Judgement', nil, 
+    function(elementName, abilityName, self)
+
+        local additional =
+        {
+            ["orbPos"] = self.SpellsTarget.CFrame.Position, 
+            ["Origin"] = self.SpellsTarget.CFrame.Position
+        }
+
+        DoMagic:InvokeServer(elementName, abilityName, additional)
+    end
+)
+
 Core.Pannel:CreateCommand('ModifySpell', 'SpellName', Core.Spells:GetAvaliableSpells(), 'modifies a certain spell', function(...)
     Core.Spells:ModifySpell(table.concat({...}, ' '))
 end)
@@ -405,7 +418,7 @@ Core.Pannel:CreateCommand('Invisible', 'Bool', {'true', 'false'}, 'enable / disa
 end)
 
 Core.Pannel:CreateCommand('AutoPunch', 'Bool', {'true', 'false'}, 'enable / disable autopunch', function(bool)
-    Core.Player:AutoPunchFunction(toboolean(bool))
+    Core.Spells:AutoPunchFunction(toboolean(bool))
 end)
 
 Core.Pannel:CreateCommand('Spawnpoint', 'Bool', {'true', 'false'}, 'enable / disable spawnpoint', function(bool)
@@ -426,6 +439,10 @@ end)
 
 Core.Pannel:CreateCommand('SkipUltCD', '', {}, 'unlocks the ultimate after resetting', function()
     Core.Spells:SkipUltCD()
+end)
+
+Core.Pannel:CreateCommand('SkipUltCDOnSpawn', 'Bool', {'true', 'false'}, 'enable / disable ultimate unlock on spawn', function(bool)
+    Core.Spells.SkipUltCDOnSpawn = toboolean(bool)
 end)
 
 --** Initialization

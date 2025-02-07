@@ -406,19 +406,6 @@ function LocalMethods:SpawnpointFunction(value)
     self.Spawnpoint = CFrame.new(0,1,0)
 end
 
-function LocalMethods:AutoPunchFunction(value)
-    self.AutoPunch = value
-    if value == false then return end
-
-    task.spawn(function()
-        while self.AutoPunch == true do
-            Combat:FireServer(self.SelectedTarget.Character)
-            task.wait(.1)
-        end
-    end)
-
-end
-
 function LocalMethods:InvisibleFunction(value)
     self.Invisibility = value
 
@@ -473,7 +460,6 @@ function LocalFabric.new(playerObj)
     self['Tracers']      = false
     self['ResetOnMana']  = false
     self['Aimbot']       = false
-    self['AutoPunch']    = false
     self['NoBulletsCD']  = false
 
     self['HasFinishedRespawning'] = true
@@ -713,6 +699,19 @@ end
 local SpellFabric = {}
 local SpellMethods = {}
 
+function SpellMethods:AutoPunchFunction(value)
+    self.AutoPunch = value
+    if value == false then return end
+
+    task.spawn(function()
+        while self.AutoPunch == true do
+            Combat:FireServer(self.SpellsTarget.Character)
+            task.wait(.1)
+        end
+    end)
+
+end
+
 function SpellMethods:GetSpellsTargetByType()
 
     self.SpellsTarget = self.LocalComponent.SelectedTarget
@@ -728,7 +727,7 @@ function SpellMethods:GetSpellsTargetByType()
     end
 
     if (not self.SpellsTarget) then self.SpellsTarget = self.LocalComponent end
-    self.LocalComponent.SelectedTarget = self.SpellsTarget
+    --self.LocalComponent.SelectedTarget = self.SpellsTarget
 end
 
 function SpellMethods:TPCharacterBySpellType(oldCFrame)
@@ -1087,11 +1086,14 @@ function SpellFabric.new(localPlayer)
     self.PredictedPosition = Vector3.new(0,0,0)
     self.PredictedVelocity = Vector3.new(0,0,0)
 
-    self.SkipCD = false
+    self.SkipCD      = false
     self.AimbotState = false
+    self.AutoPunch   = false
 
     self.AimFilter = false
     self.ApplyPing = 1
+
+    self.SkipUltCDOnSpawn = true
 
     RunService.Heartbeat:Connect(function()
         self:GetSpellsTargetByType()
@@ -1148,8 +1150,13 @@ function SpellFabric.new(localPlayer)
         end
     end)
 
-    return self
+    self.LocalComponent.Instance.CharacterAdded:Connect(function()
+        if (not self.SkipUltCDOnSpawn) then return end
+        task.wait(.5)
+        self:SkipUltCD()
+    end)
 
+    return self
 end
 
 local Player = LocalFabric.new(Players.LocalPlayer)
